@@ -1,0 +1,71 @@
+/* Fond noir global */
+html,
+body,
+.main {
+    height: 100%;
+    /* Utiliser toute la hauteur */
+    min-height: 100vh;
+    /* Adapter à la fenêtre */
+    margin: 0;
+    padding: 0;
+    background-color: #000000 !important;
+    /* Fond noir */
+    display: flex;
+    flex-direction: column;
+    overflow: visible !important;
+    /* Éviter de masquer des éléments */
+}
+
+/* Éliminer marges/paddings inutiles */
+div,
+header,
+footer,
+section {
+    margin: 0 !important;
+    padding: 0 !important;
+    background-color: #000000 !important;
+    /* Fond noir */
+    height: auto !important;
+}
+
+/* Titres */
+h1 {
+    font-size: 30px;
+    text-align: center;
+    color: #de7471;
+    /* Rouge clair */
+}
+
+h2 {
+    font-size: 30px;
+    text-align: center;
+    color: #FFFFFF;
+    /* Blanc */
+}
+
+/* Paragraphes */
+p {
+    font-size: 20px;
+    text-align: center;
+    color: #FFFFFF;
+    /* Blanc */
+}
+
+div.stButton>button {
+    background-color: #ee1216;
+    border: none;
+}
+
+div.stButton>button>div>p {
+    background-color: #ee1216;
+    /* Fond coloré pour les boutons (rouge clair) */
+    color: #FFFFFF;
+    /* Texte blanc */
+
+}
+
+/* Survol des boutons */
+div.stButton>button:hover {
+    background-color: #c34e4b;
+    /* Fond plus foncé au survol */
+}
