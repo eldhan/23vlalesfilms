@@ -8,8 +8,7 @@ body,
     /* Adapter à la fenêtre */
     margin: 0;
     padding: 0;
-    background-color: #000000 !important;
-    /* Fond noir */
+    background-color: #000000;
     display: flex;
     flex-direction: column;
     overflow: visible !important;
@@ -24,7 +23,6 @@ section {
     margin: 0 !important;
     padding: 0 !important;
     background-color: #000000 !important;
-    /* Fond noir */
     height: auto !important;
 }
 
@@ -33,14 +31,12 @@ h1 {
     font-size: 30px;
     text-align: center;
     color: #de7471;
-    /* Rouge clair */
 }
 
 h2 {
     font-size: 30px;
     text-align: center;
     color: #FFFFFF;
-    /* Blanc */
 }
 
 /* Paragraphes */
@@ -48,24 +44,21 @@ p {
     font-size: 20px;
     text-align: center;
     color: #FFFFFF;
-    /* Blanc */
 }
 
-div.stButton>button {
-    background-color: #ee1216;
-    border: none;
-}
-
+/* Boutons du menu */
+div.stButton>button,
 div.stButton>button>div>p {
     background-color: #ee1216;
-    /* Fond coloré pour les boutons (rouge clair) */
+    border: none;
     color: #FFFFFF;
-    /* Texte blanc */
-
 }
 
-/* Survol des boutons */
-div.stButton>button:hover {
+/* Boutons du menu au survol */
+div.stButton>button:hover,
+div.stButton>button:hover>div>p,
+div.stButton>button>div>p:hover {
     background-color: #c34e4b;
-    /* Fond plus foncé au survol */
+    border: none;
+    color: #FFFFFF;
 }
