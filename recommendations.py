@@ -1,6 +1,15 @@
 import streamlit as st
 import pandas as pd
 import pathlib
+import requests as re
+
+
+def get_summary():
+    url = f"https://api.themoviedb.org/3/find/{tconst}?api_key={API_KEY}&external_source=imdb_id&language=fr"
+    response = re.get(url)
+    rep = response.json()
+    resume = rep["movie_results"][0]["overview"]
+    return resume
 
 
 def recos():
@@ -14,12 +23,7 @@ def recos():
 
 def search_recos(film):
     # lecture du dataframe de recommandations
-    link = (
-        pathlib.Path().cwd()
-        / "Documents"
-        / "23vlalesfilms"
-        / "dataframe_recommandation_final.parquet"
-    )
+    link = pathlib.Path().cwd() / "dataframe_recommandation_final.parquet"
     df = pd.read_parquet(link)
 
     if film:
@@ -32,7 +36,7 @@ def search_recos(film):
 
             # Créer une liste des données des films recommandés
             results = []
-            for reco_title in recommendations[:5]:  # On limite à 5 films
+            for reco_title in recommendations[1:6]:  # On limite à 5 films
                 movie_info = df[df["tconst"] == reco_title].iloc[0].to_dict()
                 results.append(movie_info)
     else:
@@ -46,7 +50,7 @@ def search_recos(film):
 
         for col, movie in zip(cols, results):
             with col:
-                # st.image(movie["poster_path"], use_column_width=True)
+                st.image("https://image.tmdb.org/t/p/w1280/" + movie["poster_path"])
                 st.markdown(f"**{movie['originalTitle']}**")
                 st.markdown(
                     f"⭐ Note : {movie['averageRating']} (Nombre de votes : {movie['numVotes']})"
@@ -54,7 +58,6 @@ def search_recos(film):
                 st.markdown(f"Résumé : {movie['overview']}")
                 st.markdown(f"Genre : {movie['genres']}")
 
-    # TODO : gérer le fetch des images avec l'API
     # TODO : gérer la description en français (fetch with API)
     # TODO : gérer le cas des films sans image avec un placeholder
     # TODO : use difflib for approximation
