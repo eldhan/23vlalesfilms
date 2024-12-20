@@ -40,13 +40,6 @@ import os
 #                 return True
 #     return False
 
-
-# # l'appli démarre sur la page d'accueil
-# # Initialiser l'état de la page si ce n'est pas encore fait
-# if "page" not in st.session_state:
-#     st.session_state.page = "Accueil"
-
-
 # # les différentes pages de l'appli
 def accueil():
     st.title("23 v'là les films !")
@@ -86,17 +79,5 @@ def accueil():
 #         # add_user(new_username, new_password)
 #         # st.success("Compte créé avec succès ! Vous pouvez maintenant vous connecter.")
 #         st.session_state.page = "Se connecter"
-
-
-# # Afficher le contenu de la page active
-# if st.session_state.page == "Accueil":
-#     accueil()
-# elif st.session_state.page == "Recherche":
-#     recos()
-# elif st.session_state.page == "Statistiques":
-#     stats()
-# elif st.session_state.page == "Se connecter":
-#     connect()
-
 
 accueil()

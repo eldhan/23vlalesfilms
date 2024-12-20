@@ -7,7 +7,7 @@ def recos():
         "De quel film souhaitez-vous que nous nous inspirions pour vous proposer une sélection de films à regarder ?"
     )
     if film_input:
-        results = search_recos(film_input)
+        search_recos(film_input)
 
 
 def search_recos(film):
@@ -62,11 +62,11 @@ def search_recos(film):
         columns_list = [col1, col2, col3, col4, col5]
         for i in range(5):
             with columns_list[i]:
-                st.image(results[i]['image'])
-                st.markdown(results[i]['title'])
-                st.markdown(results[i]['note']+'-'+results[i]['nb_votes'])
-                st.markdown(results[i]['summary'])
-                st.markdown(results[i]['genre'])
+                st.image(results[i]["image"])
+                st.markdown(results[i]["title"])
+                st.markdown(results[i]["note"] + "-" + results[i]["nb_votes"])
+                st.markdown(results[i]["summary"])
+                st.markdown(results[i]["genre"])
 
 
 recos()
