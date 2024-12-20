@@ -1,4 +1,5 @@
 import streamlit as st
+import pathlib
 
 
 def load_css(file_name):
@@ -28,6 +29,7 @@ about = st.Page(
 # Define the navigation
 pg = st.navigation([home, recos, about])
 # Apply css
-load_css("style.css")
+css = pathlib.Path().cwd() / "Documents" / "23vlalesfilms" / "style.css"
+load_css(css)
 # Start the app
 pg.run()
