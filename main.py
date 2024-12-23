@@ -26,10 +26,18 @@ about = st.Page(
     icon=":material/theaters:",
 )
 
+kpi = st.Page(
+    page="kpi.py",
+    title="Indicateurs des tendances",
+    url_path="kpi",
+    default=False,
+    icon=":material/theaters:",
+)
+
 # Define the navigation
-pg = st.navigation([home, recos, about])
+pg = st.navigation([home, recos, kpi, about])
 # Apply css
-css = pathlib.Path().cwd() / "Documents" / "23vlalesfilms" / "style.css"
+css = pathlib.Path().cwd() / "style.css"
 load_css(css)
 # Start the app
 pg.run()
