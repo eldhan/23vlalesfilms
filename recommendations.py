@@ -18,7 +18,7 @@ def recos():
         "De quel film souhaitez-vous que nous nous inspirions pour vous proposer une sélection de films à regarder ?"
     )
     if film_input:
-        results = search_recos(film_input)
+        search_recos(film_input)
 
 
 def search_recos(film):
@@ -39,9 +39,9 @@ def search_recos(film):
             for reco_title in recommendations[1:6]:  # On limite à 5 films
                 movie_info = df[df["tconst"] == reco_title].iloc[0].to_dict()
                 results.append(movie_info)
-    else:
-        st.error("Film non trouvé dans la base de données.")
-        results = []
+        else:
+            st.error("Film non trouvé dans la base de données.")
+            results = []
 
     # Étape 2 : Afficher les films dans des colonnes
     if results:
