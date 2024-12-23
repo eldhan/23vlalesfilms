@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import pathlib
 import requests as re
+from difflib import get_close_matches
 
 
 def get_summary(tconst):
@@ -25,45 +26,51 @@ def search_recos(film):
     # lecture du dataframe de recommandations
     link = pathlib.Path().cwd() / "dataframe_recommandation_final.parquet"
     df = pd.read_parquet(link)
+    # Recherche du film correspondant
+    best_matches = get_close_matches(
+        film.lower(), df["originalTitle"].str.lower().values, n=3, cutoff=0.8
+    )
+    # si le premier résultat approchant correspond exactement au film recherché
+    if best_matches[0].lower() == film.lower():
+        # Récupérer les informations des 5 films recommandés
+        recommendations = df.loc[
+            df["originalTitle"].str.lower() == film.lower(), "nearest_neighbor_ids"
+        ].values[0]
 
-    if film:
-        # Recherche du film correspondant
-        if film in df["originalTitle"].values:
-            # Récupérer les informations des 5 films recommandés
-            recommendations = df.loc[
-                df["originalTitle"] == film, "nearest_neighbor_ids"
-            ].values[0]
-
-            # Créer une liste des données des films recommandés
-            results = []
-            for reco_title in recommendations[1:6]:  # On limite à 5 films
-                movie_info = df[df["tconst"] == reco_title].iloc[0].to_dict()
-                results.append(movie_info)
-        else:
-            st.error("Film non trouvé dans la base de données.")
-            results = []
-
-    # Étape 2 : Afficher les films dans des colonnes
-    if results:
+        # Créer une liste des données des films recommandés
+        results = []
+        for reco_title in recommendations[1:6]:  # On limite à 5 films
+            movie_info = df[df["tconst"] == reco_title].iloc[0].to_dict()
+            results.append(movie_info)
         st.subheader(f"Recommandations pour : {film}")
-        cols = st.columns(len(results))  # Créer une colonne par film
+        show_recos(results)
+    elif best_matches:
+        st.write("Vouliez-vous dire : ")
+        for match in best_matches:
+            clicked_button = st.button(label=match)
+        if clicked_button:
+            search_recos(match)
+    else:
+        st.error("Film non trouvé dans la base de données.")
 
-        for col, movie in zip(cols, results):
-            with col:
-                if movie["poster_path"]:
-                    st.image("https://image.tmdb.org/t/p/w1280/" + movie["poster_path"])
-                else:
-                    # Placeholder generated using https://placehold.co/300x400/black/red/png?text=Film&font=Lato
-                    st.image("assets/default-movie-image.png")
-                st.markdown(f"**{movie['originalTitle']}**")
-                st.markdown(
-                    f"⭐ Note : {movie['averageRating']} (Nombre de votes : {movie['numVotes']})"
-                )
-                st.markdown(f"Résumé : {get_summary(movie['tconst'])}")
-                st.markdown(f"Genre : {movie['genres']}")
 
+def show_recos(results):
     # TODO : afficher le nom du film en français
-    # TODO : use difflib for approximation
+    cols = st.columns(len(results))  # Créer une colonne par film
+
+    for col, movie in zip(cols, results):
+        with col:
+            if movie["poster_path"]:
+                st.image("https://image.tmdb.org/t/p/w1280/" + movie["poster_path"])
+            else:
+                # Placeholder generated using https://placehold.co/300x400/black/red/png?text=Film&font=Lato
+                st.image("assets/default-movie-image.png")
+            st.markdown(f"**{movie['originalTitle']}**")
+            st.markdown(
+                f"⭐ Note : {movie['averageRating']} (Nombre de votes : {movie['numVotes']})"
+            )
+            st.markdown(f"Résumé : {get_summary(movie['tconst'])}")
+            st.markdown(f"Genre : {movie['genres']}")
 
 
 recos()
