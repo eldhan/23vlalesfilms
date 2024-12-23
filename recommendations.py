@@ -4,8 +4,8 @@ import pathlib
 import requests as re
 
 
-def get_summary():
-    url = f"https://api.themoviedb.org/3/find/{tconst}?api_key={API_KEY}&external_source=imdb_id&language=fr"
+def get_summary(tconst):
+    url = f"https://api.themoviedb.org/3/find/{tconst}?api_key={st.secrets["tmdb_api_key"]}&external_source=imdb_id&language=fr"
     response = re.get(url)
     rep = response.json()
     resume = rep["movie_results"][0]["overview"]
@@ -50,16 +50,19 @@ def search_recos(film):
 
         for col, movie in zip(cols, results):
             with col:
-                st.image("https://image.tmdb.org/t/p/w1280/" + movie["poster_path"])
+                if movie["poster_path"]:
+                    st.image("https://image.tmdb.org/t/p/w1280/" + movie["poster_path"])
+                else:
+                    # Placeholder generated using https://placehold.co/300x400/black/red/png?text=Film&font=Lato
+                    st.image("assets/default-movie-image.png")
                 st.markdown(f"**{movie['originalTitle']}**")
                 st.markdown(
                     f"⭐ Note : {movie['averageRating']} (Nombre de votes : {movie['numVotes']})"
                 )
-                st.markdown(f"Résumé : {movie['overview']}")
+                st.markdown(f"Résumé : {get_summary(movie['tconst'])}")
                 st.markdown(f"Genre : {movie['genres']}")
 
-    # TODO : gérer la description en français (fetch with API)
-    # TODO : gérer le cas des films sans image avec un placeholder
+    # TODO : afficher le nom du film en français
     # TODO : use difflib for approximation
 
 
