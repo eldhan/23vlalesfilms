@@ -12,8 +12,4 @@ def about():
     )
 
 
-def stats():
-    st.title("Les statistiques sur le cinéma")
-
-
 about()
