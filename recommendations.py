@@ -71,9 +71,8 @@ def show_recos(results):
                 # Placeholder generated using https://placehold.co/300x400/black/red/png?text=Film&font=Lato
                 st.image("assets/default-movie-image.png")
             st.markdown(f"**{movie['originalTitle']}**")
-            st.markdown(
-                f"⭐ Note : {movie['averageRating']} (Nombre de votes : {movie['numVotes']})"
-            )
+            st.markdown(f"⭐ Note : {movie['averageRating']} / 10")
+            st.markdown(f"({movie['numVotes']} votes)")
             summary = get_summary(movie["tconst"])
             st.markdown(
                 f"Résumé : {[summary if summary != "error" else movie['overview']]}"

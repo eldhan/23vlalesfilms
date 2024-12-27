@@ -1,64 +1,51 @@
-/* Fond noir global */
-html,
-body,
-.main {
-    height: 100%;
-    /* Utiliser toute la hauteur */
-    min-height: 100vh;
-    /* Adapter à la fenêtre */
-    margin: 0;
-    padding: 0;
-    background-color: #000000;
-    display: flex;
-    flex-direction: column;
-    overflow: visible !important;
-    /* Éviter de masquer des éléments */
-}
-
-/* Éliminer marges/paddings inutiles */
-div,
-header,
-footer,
-section {
-    margin: 0 !important;
-    padding: 0 !important;
-    background-color: #000000 !important;
-    height: auto !important;
+/* Global styling */
+.stApp {
+    width: 100%;
+    min-width: auto;
+    max-width: initial;
+    padding-left: 15rem;
+    padding-right: 15rem;
+    padding-top: 15px;
+    padding-bottom: 40px;
 }
 
 /* Titres */
 h1 {
     font-size: 30px;
     text-align: center;
-    color: #de7471;
+    color: rgb(220, 23, 33);
 }
 
 h2 {
     font-size: 30px;
     text-align: center;
-    color: #FFFFFF;
 }
 
 /* Paragraphes */
 p {
     font-size: 20px;
     text-align: center;
-    color: #FFFFFF;
 }
 
 /* Boutons du menu */
-div.stButton>button,
-div.stButton>button>div>p {
-    background-color: #ee1216;
+[data-testid="stHorizontalBlock"] {
+    max-width: 80%;
+    align-content: center;
+}
+
+[data-testid="stPageLink-NavLink"] {
+    background-color: rgb(193, 17, 25);
     border: none;
     color: #FFFFFF;
 }
 
 /* Boutons du menu au survol */
-div.stButton>button:hover,
-div.stButton>button:hover>div>p,
-div.stButton>button>div>p:hover {
-    background-color: #c34e4b;
+[data-testid="stPageLink-NavLink"]:hover {
+    background-color: #e50914;
     border: none;
     color: #FFFFFF;
+}
+
+[data-testid="stTextInputRootElement"] input {
+    color: #000000;
 }
