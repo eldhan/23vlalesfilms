@@ -7,10 +7,14 @@ from difflib import get_close_matches
 
 def get_summary(tconst):
     url = f"https://api.themoviedb.org/3/find/{tconst}?api_key={st.secrets["tmdb_api_key"]}&external_source=imdb_id&language=fr"
-    response = re.get(url)
-    rep = response.json()
-    resume = rep["movie_results"][0]["overview"]
-    return resume
+    try:
+        response = re.get(url)
+    except Exception:
+        return "error"
+    else:
+        rep = response.json()
+        resume = rep["movie_results"][0]["overview"]
+        return resume
 
 
 def recos():
@@ -30,26 +34,27 @@ def search_recos(film):
     best_matches = get_close_matches(
         film.lower(), df["originalTitle"].str.lower().values, n=3, cutoff=0.8
     )
-    # si le premier résultat approchant correspond exactement au film recherché
-    if best_matches[0].lower() == film.lower():
-        # Récupérer les informations des 5 films recommandés
-        recommendations = df.loc[
-            df["originalTitle"].str.lower() == film.lower(), "nearest_neighbor_ids"
-        ].values[0]
+    if best_matches:
+        # si le premier résultat approchant correspond exactement au film recherché
+        if best_matches[0].lower() == film.lower():
+            # Récupérer les informations des 5 films recommandés
+            recommendations = df.loc[
+                df["originalTitle"].str.lower() == film.lower(), "nearest_neighbor_ids"
+            ].values[0]
 
-        # Créer une liste des données des films recommandés
-        results = []
-        for reco_title in recommendations[1:6]:  # On limite à 5 films
-            movie_info = df[df["tconst"] == reco_title].iloc[0].to_dict()
-            results.append(movie_info)
-        st.subheader(f"Recommandations pour : {film}")
-        show_recos(results)
-    elif best_matches:
-        st.write("Vouliez-vous dire : ")
-        for match in best_matches:
-            clicked_button = st.button(label=match)
-        if clicked_button:
-            search_recos(match)
+            # Créer une liste des données des films recommandés
+            results = []
+            for reco_title in recommendations[1:6]:  # On limite à 5 films
+                movie_info = df[df["tconst"] == reco_title].iloc[0].to_dict()
+                results.append(movie_info)
+            st.subheader(f"Recommandations pour : {film}")
+            show_recos(results)
+        elif best_matches:
+            st.write("Vouliez-vous dire : ")
+            for match in best_matches:
+                clicked_button = st.button(label=match)
+            if clicked_button:
+                search_recos(match)
     else:
         st.error("Film non trouvé dans la base de données.")
 
@@ -69,7 +74,10 @@ def show_recos(results):
             st.markdown(
                 f"⭐ Note : {movie['averageRating']} (Nombre de votes : {movie['numVotes']})"
             )
-            st.markdown(f"Résumé : {get_summary(movie['tconst'])}")
+            summary = get_summary(movie["tconst"])
+            st.markdown(
+                f"Résumé : {[summary if summary != "error" else movie['overview']]}"
+            )
             st.markdown(f"Genre : {movie['genres']}")
 
 
