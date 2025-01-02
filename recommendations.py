@@ -75,7 +75,7 @@ def show_recos(results):
             st.markdown(f"({movie['numVotes']} votes)")
             summary = get_summary(movie["tconst"])
             st.markdown(
-                f"Résumé : {[summary if summary != "error" else movie['overview']]}"
+                f"Résumé : {summary if (summary != "error" and summary != "") else "Pas de résumé disponible"}"
             )
             st.markdown(f"Genre : {movie['genres']}")
 
