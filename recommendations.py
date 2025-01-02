@@ -32,7 +32,7 @@ def search_recos(film):
     df = pd.read_parquet(link)
     # Recherche du film correspondant
     best_matches = get_close_matches(
-        film.lower(), df["originalTitle"].str.lower().values, n=3, cutoff=0.8
+        film.lower(), df["originalTitle"].str.lower().values, n=3, cutoff=0.2
     )
     if best_matches:
         # si le premier résultat approchant correspond exactement au film recherché
@@ -53,8 +53,9 @@ def search_recos(film):
             st.write("Vouliez-vous dire : ")
             for match in best_matches:
                 clicked_button = st.button(label=match)
-            if clicked_button:
-                search_recos(match)
+                if clicked_button:
+                    search_recos(match)
+
     else:
         st.error("Film non trouvé dans la base de données.")
 
