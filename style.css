@@ -3,10 +3,6 @@
     width: 100%;
     min-width: auto;
     max-width: initial;
-    padding-left: 15rem;
-    padding-right: 15rem;
-    padding-top: 15px;
-    padding-bottom: 40px;
 }
 
 /* Titres */
@@ -46,6 +42,14 @@ p {
     color: #FFFFFF;
 }
 
-[data-testid="stTextInputRootElement"] input {
+[data-testid="stSelectbox"] div,
+[data-testid="stSelectbox"] input,
+[data-testid="stTooltipHoverTarget"]:hover,
+[data-testid="stTooltipHoverTarget"]:active,
+li[aria-selected="true"] {
     color: #000000;
+}
+
+[data-testid="stSelectbox"] label>div {
+    color: #FFFFFF;
 }

@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import pathlib
 import requests as re
-from difflib import get_close_matches
 
 
 def get_summary(tconst):
@@ -17,52 +16,31 @@ def get_summary(tconst):
         return resume
 
 
-def recos():
-    st.title("Mes films à voir")
-    film_input = st.text_input(
-        "De quel film souhaitez-vous que nous nous inspirions pour vous proposer une sélection de films à regarder ?"
-    )
-    if film_input:
-        search_recos(film_input)
+def retrieve_recos(movie: str, df) -> None:
+    """
+    Retrieve the information for the 5 recommended movies
+
+    Parameters:
+    movie: the movie for which the user is looking for recommandations
+    df: the dataframe containing all the information related to the movies
+    """
+    # Retrieve the recommandations
+    recommendations = df.loc[
+        df["originalTitle"].str.lower() == movie.lower(), "nearest_neighbor_ids"
+    ].values[0]
+
+    # Create a list of the recommended movies details
+    results = []
+    for reco_title in recommendations[1:6]:  # We limit to 5 films
+        movie_info = df[df["tconst"] == reco_title].iloc[0].to_dict()
+        results.append(movie_info)
+    st.subheader(f"Recommandations pour : {movie}")
+    display_recos(results)
 
 
-def search_recos(film):
-    # lecture du dataframe de recommandations
-    link = pathlib.Path().cwd() / "dataframe_recommandation_final.parquet"
-    df = pd.read_parquet(link)
-    # Recherche du film correspondant
-    best_matches = get_close_matches(
-        film.lower(), df["originalTitle"].str.lower().values, n=3, cutoff=0.2
-    )
-    if best_matches:
-        # si le premier résultat approchant correspond exactement au film recherché
-        if best_matches[0].lower() == film.lower():
-            # Récupérer les informations des 5 films recommandés
-            recommendations = df.loc[
-                df["originalTitle"].str.lower() == film.lower(), "nearest_neighbor_ids"
-            ].values[0]
-
-            # Créer une liste des données des films recommandés
-            results = []
-            for reco_title in recommendations[1:6]:  # On limite à 5 films
-                movie_info = df[df["tconst"] == reco_title].iloc[0].to_dict()
-                results.append(movie_info)
-            st.subheader(f"Recommandations pour : {film}")
-            show_recos(results)
-        elif best_matches:
-            st.write("Vouliez-vous dire : ")
-            for match in best_matches:
-                clicked_button = st.button(label=match)
-                if clicked_button:
-                    search_recos(match)
-
-    else:
-        st.error("Film non trouvé dans la base de données.")
-
-
-def show_recos(results):
-    # TODO : afficher le nom du film en français
-    cols = st.columns(len(results))  # Créer une colonne par film
+def display_recos(results: list) -> None:
+    # Create a column by movie
+    cols = st.columns(len(results))
 
     for col, movie in zip(cols, results):
         with col:
@@ -81,4 +59,27 @@ def show_recos(results):
             st.markdown(f"Genre : {movie['genres']}")
 
 
-recos()
+# Page display
+st.title("Mes films à voir")
+
+# Create a dataframe from the parquet file containing the recommandations obtained by machine learning
+link = pathlib.Path().cwd() / "dataframe_recommandation_final.parquet"
+df = pd.read_parquet(link)
+
+# User input to use for movie search
+
+movie_options = [
+    f"{title} ({year})" for title, year in zip(df["originalTitle"], df["startYear"])
+]
+
+movie_selected = st.selectbox(
+    label="De quel film souhaitez-vous que nous nous inspirions pour vous proposer une sélection de films à regarder ?",
+    options=movie_options,
+    index=None,
+    placeholder="Saisissez le nom du film",
+)
+
+if movie_selected:
+    selected_title_split = movie_selected.split(" (")
+    original_title = selected_title_split[0]
+    retrieve_recos(original_title, df)
