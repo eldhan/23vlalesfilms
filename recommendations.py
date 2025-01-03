@@ -4,7 +4,13 @@ import pathlib
 import requests as re
 
 
-def get_summary(tconst):
+def get_summary(tconst: str) -> str:
+    """
+    Retrieve the summary in French from tmdb
+
+    Parameters:
+    tconst: the IMDb identifier for the film
+    """
     url = f"https://api.themoviedb.org/3/find/{tconst}?api_key={st.secrets["tmdb_api_key"]}&external_source=imdb_id&language=fr"
     try:
         response = re.get(url)
@@ -16,25 +22,72 @@ def get_summary(tconst):
         return resume
 
 
-def retrieve_recos(movie: str, df) -> None:
+def get_title(tconst: str) -> str:
+    """
+    Retrieve the title in French from tmdb
+
+    Parameters:
+    tconst: the IMDb identifier for the film
+    """
+    url = f"https://api.themoviedb.org/3/find/{tconst}?api_key={st.secrets["tmdb_api_key"]}&external_source=imdb_id&language=fr"
+    try:
+        response = re.get(url)
+    except Exception:
+        return "error"
+    else:
+        rep = response.json()
+        resume = rep["movie_results"][0]["title"]
+        return resume
+
+
+def retrieve_movie(tconst: str) -> None:
+    link = pathlib.Path().cwd() / "datasets/df_recommandations.parquet"
+    df = pd.read_parquet(link)
+
+    movie = df.loc[df["tconst"] == tconst, :]
+    col1, col2 = st.columns(2)
+    with col1:
+        if not movie["poster_path"].empty:
+            st.image(
+                "https://image.tmdb.org/t/p/w1280/" + movie["poster_path"].values[0],
+                width=200,
+            )
+        else:
+            # Placeholder generated using https://placehold.co/300x400/black/red/png?text=Film&font=Lato
+            st.image("assets/default-movie-image.png")
+    with col2:
+        title = get_title(movie["tconst"].values[0])
+        st.markdown(
+            f"**{title if (title != "error" and title != "") else ''}** \n {'('+movie['originalTitle'].values[0]+')' if title.lower() != movie['originalTitle'].values[0].lower() else ''}"
+        )
+        st.markdown(
+            f"⭐ Note : {movie['averageRating'].values[0]} / 10 ({movie['numVotes'].values[0]} votes)"
+        )
+        summary = get_summary(movie["tconst"].values[0])
+        st.markdown(
+            f"Résumé : {summary if (summary != "error" and summary != "") else "Pas de résumé disponible"}"
+        )
+        st.markdown(f"Genre : {movie['genres'].values[0]}")
+
+
+def retrieve_recos(tconst: str) -> None:
     """
     Retrieve the information for the 5 recommended movies
 
     Parameters:
-    movie: the movie for which the user is looking for recommandations
-    df: the dataframe containing all the information related to the movies
+    tconst: the movie id for which the user is looking for recommandations
     """
+    # Create a dataframe from the parquet file containing the recommandations obtained by machine learning
+    link = pathlib.Path().cwd() / "datasets/df_recommandations.parquet"
+    df = pd.read_parquet(link)
     # Retrieve the recommandations
-    recommendations = df.loc[
-        df["originalTitle"].str.lower() == movie.lower(), "nearest_neighbor_ids"
-    ].values[0]
+    recommendations = df.loc[df["tconst"] == tconst, "nearest_neighbor_ids"].values[0]
 
     # Create a list of the recommended movies details
     results = []
     for reco_title in recommendations[1:6]:  # We limit to 5 films
         movie_info = df[df["tconst"] == reco_title].iloc[0].to_dict()
         results.append(movie_info)
-    st.subheader(f"Recommandations pour : {movie}")
     display_recos(results)
 
 
@@ -49,7 +102,10 @@ def display_recos(results: list) -> None:
             else:
                 # Placeholder generated using https://placehold.co/300x400/black/red/png?text=Film&font=Lato
                 st.image("assets/default-movie-image.png")
-            st.markdown(f"**{movie['originalTitle']}**")
+            title = get_title(movie["tconst"])
+            st.markdown(
+                f"**{title if (title != "error" and title != "") else ''}** \n {'('+movie['originalTitle']+')' if title.lower() != movie['originalTitle'].lower() else ''}"
+            )
             st.markdown(f"⭐ Note : {movie['averageRating']} / 10")
             st.markdown(f"({movie['numVotes']} votes)")
             summary = get_summary(movie["tconst"])
@@ -62,14 +118,13 @@ def display_recos(results: list) -> None:
 # Page display
 st.title("Mes films à voir")
 
-# Create a dataframe from the parquet file containing the recommandations obtained by machine learning
-link = pathlib.Path().cwd() / "dataframe_recommandation_final.parquet"
+
+link = pathlib.Path().cwd() / "datasets/df_fr_titles.parquet"
 df = pd.read_parquet(link)
 
 # User input to use for movie search
-
 movie_options = [
-    f"{title} ({year})" for title, year in zip(df["originalTitle"], df["startYear"])
+    f"{title} ({year})" for title, year in zip(df["frTitle"], df["startYear"])
 ]
 
 movie_selected = st.selectbox(
@@ -81,5 +136,11 @@ movie_selected = st.selectbox(
 
 if movie_selected:
     selected_title_split = movie_selected.split(" (")
-    original_title = selected_title_split[0]
-    retrieve_recos(original_title, df)
+    title = selected_title_split[0]
+    movie_id = df.loc[df["frTitle"] == title, "tconst"].values[0]
+
+    # Display info of selected movie
+    retrieve_movie(movie_id)
+    # Display the recommandations
+    st.subheader(f"Recommandations pour {title}:")
+    retrieve_recos(movie_id)
