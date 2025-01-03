@@ -37,8 +37,7 @@ kpi = st.Page(
 
 # Define the navigation
 st.set_page_config(layout="wide")
-pg = st.navigation([home, recos, kpi, about], position="hidden")
-menu()
+pg = st.navigation([home, recos, kpi, about])
 # Apply css
 css = pathlib.Path().cwd() / "style.css"
 load_css(css)

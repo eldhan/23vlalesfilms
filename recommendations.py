@@ -45,7 +45,7 @@ def retrieve_movie(tconst: str) -> None:
     df = pd.read_parquet(link)
 
     movie = df.loc[df["tconst"] == tconst, :]
-    col1, col2 = st.columns(2)
+    col1, col2 = st.columns([0.2, 0.8])
     with col1:
         if not movie["poster_path"].empty:
             st.image(
@@ -65,7 +65,7 @@ def retrieve_movie(tconst: str) -> None:
         )
         summary = get_summary(movie["tconst"].values[0])
         st.markdown(
-            f"Résumé : {summary if (summary != "error" and summary != "") else "Pas de résumé disponible"}"
+            f"__Résumé__ : {summary if (summary != "error" and summary != "") else "Pas de résumé disponible"}"
         )
         st.markdown(f"Genre : {movie['genres'].values[0]}")
 
@@ -104,13 +104,13 @@ def display_recos(results: list) -> None:
                 st.image("assets/default-movie-image.png")
             title = get_title(movie["tconst"])
             st.markdown(
-                f"**{title if (title != "error" and title != "") else ''}** \n {'('+movie['originalTitle']+')' if title.lower() != movie['originalTitle'].lower() else ''}"
+                f"**{title if (title != "error" and title != "") else ''}**  {'('+movie['originalTitle']+')' if title.lower() != movie['originalTitle'].lower() else ''}"
             )
             st.markdown(f"⭐ Note : {movie['averageRating']} / 10")
             st.markdown(f"({movie['numVotes']} votes)")
             summary = get_summary(movie["tconst"])
             st.markdown(
-                f"Résumé : {summary if (summary != "error" and summary != "") else "Pas de résumé disponible"}"
+                f"__Résumé__ : {summary if (summary != "error" and summary != "") else "Pas de résumé disponible"}"
             )
             st.markdown(f"Genre : {movie['genres']}")
 
@@ -137,7 +137,10 @@ movie_selected = st.selectbox(
 if movie_selected:
     selected_title_split = movie_selected.split(" (")
     title = selected_title_split[0]
-    movie_id = df.loc[df["frTitle"] == title, "tconst"].values[0]
+    year = selected_title_split[1].strip(")")
+    movie_id = df.loc[
+        (df["frTitle"] == title) & (df["startYear"] == year), "tconst"
+    ].values[0]
 
     # Display info of selected movie
     retrieve_movie(movie_id)

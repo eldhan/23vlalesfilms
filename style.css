@@ -20,16 +20,15 @@ h2 {
 /* Paragraphes */
 p {
     font-size: 20px;
-    text-align: center;
 }
 
 /* Boutons du menu */
 [data-testid="stHorizontalBlock"] {
-    max-width: 80%;
+    max-width: 100%;
     align-content: center;
 }
 
-[data-testid="stPageLink-NavLink"] {
+[data-testid="stSidebarContent"] {
     background-color: rgb(193, 17, 25);
     border: none;
     color: #FFFFFF;
