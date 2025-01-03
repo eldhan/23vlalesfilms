@@ -1,72 +1,149 @@
 import streamlit as st
+import pandas as pd
+import pathlib
+import requests as re
 
 
-def recos():
-    st.title("Mes films à voir")
-    film_input = st.text_input(
-        "De quel film souhaitez-vous que nous nous inspirions pour vous proposer une sélection de films à regarder ?"
-    )
-    if film_input:
-        search_recos(film_input)
+def get_summary(tconst: str) -> str:
+    """
+    Retrieve the summary in French from tmdb
+
+    Parameters:
+    tconst: the IMDb identifier for the film
+    """
+    url = f"https://api.themoviedb.org/3/find/{tconst}?api_key={st.secrets["tmdb_api_key"]}&external_source=imdb_id&language=fr"
+    try:
+        response = re.get(url)
+    except Exception:
+        return "error"
+    else:
+        rep = response.json()
+        resume = rep["movie_results"][0]["overview"]
+        return resume
 
 
-def search_recos(film):
-    # TODO : algo qui retourne les résultats
-    # TODO : gérer le cas des films sans image avec un placeholder
-    # TODO : use difflib for approximation
-    results = [
-        {
-            "image": "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/fbxQ44VRdM2PVzHSNajUseUteem.jpg",
-            "title": "Harry Potter à l'école des sorciers",
-            "note": "7,7",
-            "nb_votes": "884k",
-            "summary": "Orphelin, le jeune Harry Potter peut enfin quitter ses tyranniques oncle et tante Dursley lorsqu'un curieux messager lui révèle qu'il est un sorcier. À 11 ans, Harry va enfin pouvoir intégrer la légendaire école de sorcellerie de Poudlard, y trouver une famille digne de ce nom et des amis, développer ses dons, et préparer son glorieux avenir.",
-            "genre": "Aventure, Fantastique",
-        },
-        {
-            "image": "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/8KpHRokGpiaqEGpjYe0rpywtvUx.jpg",
-            "title": "Harry Potter et la Chambre des secrets",
-            "note": "7,7",
-            "nb_votes": "884k",
-            "summary": "Orphelin, le jeune Harry Potter peut enfin quitter ses tyranniques oncle et tante Dursley lorsqu'un curieux messager lui révèle qu'il est un sorcier. À 11 ans, Harry va enfin pouvoir intégrer la légendaire école de sorcellerie de Poudlard, y trouver une famille digne de ce nom et des amis, développer ses dons, et préparer son glorieux avenir.",
-            "genre": "Aventure, Fantastique",
-        },
-        {
-            "image": "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/t4P2079IyK19njHDP2GwQrKdvzd.jpg",
-            "title": "Harry Potter et le Prisonnier d'Azkaban",
-            "note": "7,7",
-            "nb_votes": "884k",
-            "summary": "Orphelin, le jeune Harry Potter peut enfin quitter ses tyranniques oncle et tante Dursley lorsqu'un curieux messager lui révèle qu'il est un sorcier. À 11 ans, Harry va enfin pouvoir intégrer la légendaire école de sorcellerie de Poudlard, y trouver une famille digne de ce nom et des amis, développer ses dons, et préparer son glorieux avenir.",
-            "genre": "Aventure, Fantastique",
-        },
-        {
-            "image": "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/hBak1pn5pbI4ycAbrgMMn1YI7P1.jpg",
-            "title": "Harry Potter et la Coupe de feu",
-            "note": "7,7",
-            "nb_votes": "884k",
-            "summary": "Orphelin, le jeune Harry Potter peut enfin quitter ses tyranniques oncle et tante Dursley lorsqu'un curieux messager lui révèle qu'il est un sorcier. À 11 ans, Harry va enfin pouvoir intégrer la légendaire école de sorcellerie de Poudlard, y trouver une famille digne de ce nom et des amis, développer ses dons, et préparer son glorieux avenir.",
-            "genre": "Aventure, Fantastique",
-        },
-        {
-            "image": "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/9ZfpCVNx0y8jpColnnfdA1HI4Zb.jpg",
-            "title": "Harry Potter et l'Ordre du Phénix",
-            "note": "7,7",
-            "nb_votes": "884k",
-            "summary": "Orphelin, le jeune Harry Potter peut enfin quitter ses tyranniques oncle et tante Dursley lorsqu'un curieux messager lui révèle qu'il est un sorcier. À 11 ans, Harry va enfin pouvoir intégrer la légendaire école de sorcellerie de Poudlard, y trouver une famille digne de ce nom et des amis, développer ses dons, et préparer son glorieux avenir.",
-            "genre": "Aventure, Fantastique",
-        },
-    ]
-    container = st.container(height=None, key="reco")
-    with container:
-        col1, col2, col3, col4, col5 = st.columns(5)
-        columns_list = [col1, col2, col3, col4, col5]
-        for i in range(5):
-            with columns_list[i]:
-                st.image(results[i]["image"])
-                st.markdown(results[i]["title"])
-                st.markdown(results[i]["note"] + "-" + results[i]["nb_votes"])
-                st.markdown(results[i]["summary"])
-                st.markdown(results[i]["genre"])
+def get_title(tconst: str) -> str:
+    """
+    Retrieve the title in French from tmdb
+
+    Parameters:
+    tconst: the IMDb identifier for the film
+    """
+    url = f"https://api.themoviedb.org/3/find/{tconst}?api_key={st.secrets["tmdb_api_key"]}&external_source=imdb_id&language=fr"
+    try:
+        response = re.get(url)
+    except Exception:
+        return "error"
+    else:
+        rep = response.json()
+        resume = rep["movie_results"][0]["title"]
+        return resume
 
 
-recos()
+def retrieve_movie(tconst: str) -> None:
+    link = pathlib.Path().cwd() / "datasets/df_recommandations.parquet"
+    df = pd.read_parquet(link)
+
+    movie = df.loc[df["tconst"] == tconst, :]
+    col1, col2 = st.columns([0.2, 0.8])
+    with col1:
+        if not movie["poster_path"].empty:
+            st.image(
+                "https://image.tmdb.org/t/p/w1280/" + movie["poster_path"].values[0],
+                width=200,
+            )
+        else:
+            # Placeholder generated using https://placehold.co/300x400/black/red/png?text=Film&font=Lato
+            st.image("assets/default-movie-image.png")
+    with col2:
+        title = get_title(movie["tconst"].values[0])
+        st.markdown(
+            f"**{title if (title != "error" and title != "") else ''}** \n {'('+movie['originalTitle'].values[0]+')' if title.lower() != movie['originalTitle'].values[0].lower() else ''}"
+        )
+        st.markdown(
+            f"⭐ Note : {movie['averageRating'].values[0]} / 10 ({movie['numVotes'].values[0]} votes)"
+        )
+        summary = get_summary(movie["tconst"].values[0])
+        st.markdown(
+            f"__Résumé__ : {summary if (summary != "error" and summary != "") else "Pas de résumé disponible"}"
+        )
+        st.markdown(f"Genre : {movie['genres'].values[0]}")
+
+
+def retrieve_recos(tconst: str) -> None:
+    """
+    Retrieve the information for the 5 recommended movies
+
+    Parameters:
+    tconst: the movie id for which the user is looking for recommandations
+    """
+    # Create a dataframe from the parquet file containing the recommandations obtained by machine learning
+    link = pathlib.Path().cwd() / "datasets/df_recommandations.parquet"
+    df = pd.read_parquet(link)
+    # Retrieve the recommandations
+    recommendations = df.loc[df["tconst"] == tconst, "nearest_neighbor_ids"].values[0]
+
+    # Create a list of the recommended movies details
+    results = []
+    for reco_title in recommendations[1:6]:  # We limit to 5 films
+        movie_info = df[df["tconst"] == reco_title].iloc[0].to_dict()
+        results.append(movie_info)
+    display_recos(results)
+
+
+def display_recos(results: list) -> None:
+    # Create a column by movie
+    cols = st.columns(len(results))
+
+    for col, movie in zip(cols, results):
+        with col:
+            if movie["poster_path"]:
+                st.image("https://image.tmdb.org/t/p/w1280/" + movie["poster_path"])
+            else:
+                # Placeholder generated using https://placehold.co/300x400/black/red/png?text=Film&font=Lato
+                st.image("assets/default-movie-image.png")
+            title = get_title(movie["tconst"])
+            st.markdown(
+                f"**{title if (title != "error" and title != "") else ''}**  {'('+movie['originalTitle']+')' if title.lower() != movie['originalTitle'].lower() else ''}"
+            )
+            st.markdown(f"⭐ Note : {movie['averageRating']} / 10")
+            st.markdown(f"({movie['numVotes']} votes)")
+            summary = get_summary(movie["tconst"])
+            st.markdown(
+                f"__Résumé__ : {summary if (summary != "error" and summary != "") else "Pas de résumé disponible"}"
+            )
+            st.markdown(f"Genre : {movie['genres']}")
+
+
+# Page display
+st.title("Mes films à voir")
+
+
+link = pathlib.Path().cwd() / "datasets/df_fr_titles.parquet"
+df = pd.read_parquet(link)
+
+# User input to use for movie search
+movie_options = [
+    f"{title} ({year})" for title, year in zip(df["frTitle"], df["startYear"])
+]
+
+movie_selected = st.selectbox(
+    label="De quel film souhaitez-vous que nous nous inspirions pour vous proposer une sélection de films à regarder ?",
+    options=movie_options,
+    index=None,
+    placeholder="Saisissez le nom du film",
+)
+
+if movie_selected:
+    selected_title_split = movie_selected.split(" (")
+    title = selected_title_split[0]
+    year = selected_title_split[1].strip(")")
+    movie_id = df.loc[
+        (df["frTitle"] == title) & (df["startYear"] == year), "tconst"
+    ].values[0]
+
+    # Display info of selected movie
+    retrieve_movie(movie_id)
+    # Display the recommandations
+    st.subheader(f"Recommandations pour {title}:")
+    retrieve_recos(movie_id)
