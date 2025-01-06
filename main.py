@@ -1,6 +1,5 @@
 import streamlit as st
 import pathlib
-from menu import menu
 
 
 def load_css(file_name):
@@ -37,7 +36,9 @@ kpi = st.Page(
 
 # Define the navigation
 st.set_page_config(layout="wide")
-pg = st.navigation([home, recos, kpi, about])
+with st.sidebar:
+    st.image("assets/logo.png")
+    pg = st.navigation([home, recos, kpi, about])
 # Apply css
 css = pathlib.Path().cwd() / "style.css"
 load_css(css)

@@ -7,7 +7,7 @@
 
 /* Titres */
 h1 {
-    font-size: 30px;
+    font-size: 60px;
     text-align: center;
     color: rgb(220, 23, 33);
 }
@@ -51,4 +51,9 @@ li[aria-selected="true"] {
 
 [data-testid="stSelectbox"] label>div {
     color: #FFFFFF;
+}
+
+.st-emotion-cache-1xf0csu {
+    width: 80%;
+    margin-left: 10%;
 }

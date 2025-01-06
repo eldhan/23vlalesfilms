@@ -116,7 +116,7 @@ def display_recos(results: list) -> None:
 
 
 # Page display
-st.title("Mes films à voir")
+st.title("Trouvez vos recommandations de films")
 
 
 link = pathlib.Path().cwd() / "datasets/df_fr_titles.parquet"
@@ -128,7 +128,7 @@ movie_options = [
 ]
 
 movie_selected = st.selectbox(
-    label="De quel film souhaitez-vous que nous nous inspirions pour vous proposer une sélection de films à regarder ?",
+    label="Choisissez un film qui vous inspire :",
     options=movie_options,
     index=None,
     placeholder="Saisissez le nom du film",
@@ -143,7 +143,8 @@ if movie_selected:
     ].values[0]
 
     # Display info of selected movie
+    st.subheader(f"Vous avez choisi le film suivant :")
     retrieve_movie(movie_id)
     # Display the recommandations
-    st.subheader(f"Recommandations pour {title}:")
+    st.subheader(f"Nous vous recommandons :")
     retrieve_recos(movie_id)
