@@ -1,5 +1,4 @@
 import streamlit as st
-import pathlib
 
 
 def load_css(file_name):

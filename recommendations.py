@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import pathlib
 import requests as re
 
 
@@ -41,7 +40,7 @@ def get_title(tconst: str) -> str:
 
 
 def retrieve_movie(tconst: str) -> None:
-    link = pathlib.Path().cwd() / "datasets/df_recommandations.parquet"
+    link = "datasets/df_recommandations.parquet"
     df = pd.read_parquet(link)
 
     movie = df.loc[df["tconst"] == tconst, :]
@@ -78,7 +77,7 @@ def retrieve_recos(tconst: str) -> None:
     tconst: the movie id for which the user is looking for recommandations
     """
     # Create a dataframe from the parquet file containing the recommandations obtained by machine learning
-    link = pathlib.Path().cwd() / "datasets/df_recommandations.parquet"
+    link = "datasets/df_recommandations.parquet"
     df = pd.read_parquet(link)
     # Retrieve the recommandations
     recommendations = df.loc[df["tconst"] == tconst, "nearest_neighbor_ids"].values[0]
@@ -119,7 +118,7 @@ def display_recos(results: list) -> None:
 st.title("Trouvez vos recommandations de films")
 
 
-link = pathlib.Path().cwd() / "datasets/df_fr_titles.parquet"
+link = "datasets/df_fr_titles.parquet"
 df = pd.read_parquet(link)
 
 # User input to use for movie search
@@ -143,8 +142,8 @@ if movie_selected:
     ].values[0]
 
     # Display info of selected movie
-    st.subheader(f"Vous avez choisi le film suivant :")
+    st.subheader("Vous avez choisi le film suivant :")
     retrieve_movie(movie_id)
     # Display the recommandations
-    st.subheader(f"Nous vous recommandons :")
+    st.subheader("Nous vous recommandons :")
     retrieve_recos(movie_id)
