@@ -61,3 +61,7 @@ li[aria-selected="true"] {
 .iframe_powerbi {
     width: 100%;
 }
+
+.centered-paragraph {
+    text-align: center;
+}
