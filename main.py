@@ -40,7 +40,7 @@ with st.sidebar:
     st.image("assets/logo.png")
     pg = st.navigation([home, recos, kpi, about])
 # Apply css
-css = pathlib.Path().cwd() / "style.css"
+css = "assets/style.css"
 load_css(css)
 # Start the app
 pg.run()
