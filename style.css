@@ -57,3 +57,7 @@ li[aria-selected="true"] {
     width: 80%;
     margin-left: 10%;
 }
+
+.iframe_powerbi {
+    width: 100%;
+}
